@@ -12,11 +12,12 @@ The repository contains the following files:
 - **CMPO_2_Oleg_Łyżwiński.pdf**: A detailed report (in Polish) describing the project's methodology, algorithms, and results.
 - **Images**: A set of images used for testing, including:
   - `1.png`, `1_blur.png`, `1_gradient.png`, `1_salt_pepper.png`: Example images with different filters applied.
+- **Results**: Recognized cards.
 
 ## Example Image
 Below is an example of the input image (`1.png`) used in the project:
 
-![Example Image](1.png)
+![Example Image](Images/1.png)
 
 This image contains four UNO cards arranged in a line, which the algorithm processes to detect and recognize the cards.
 
@@ -45,4 +46,7 @@ The project follows a structured workflow, as illustrated in the block diagram i
 ## Results
 The algorithm successfully recognizes UNO cards from the provided images, even with applied filters. Below are examples of the output for different image sets:
 
-![Example Image](Recognized_card.png)
+![Example Image](Results/Recognized_card.png)
+![Example Image](Results/Recognized_card_salt_pepper.png)
+![Example Image](Results/Recognized_card_blur.png)
+![Example Image](Results/Recognized_card_gradient.png)
