@@ -1,1 +1,3 @@
 myvenv/
+.gitignore
+UNO_card_recognition.py
