@@ -8,7 +8,6 @@ This project focuses on developing a Python-based application capable of recogni
 
 ## Project Structure
 The repository contains the following files:
-- **UNO_card_recognition.py**: The main Python script implementing the card recognition algorithm.
 - **CMPO_2_Oleg_Łyżwiński.pdf**: A detailed report (in Polish) describing the project's methodology, algorithms, and results.
 - **Images**: A set of images used for testing, including:
   - `1.png`, `1_blur.png`, `1_gradient.png`, `1_salt_pepper.png`: Example images with different filters applied.
