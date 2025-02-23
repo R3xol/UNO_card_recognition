@@ -1,11 +1,3 @@
-'''class Card:
-    def __init__(self, image, box, center):
-        self.image = image
-        self.box = box
-        self.center = center
-        self.color = None
-        self.symbol = None'''
-
 from dataclasses import dataclass
 import numpy as np
 from typing import List, Optional, Union
