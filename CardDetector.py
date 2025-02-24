@@ -43,9 +43,7 @@ class CardDetector:
             min_rectangle = cv.minAreaRect(outline)
             box = cv.boxPoints(min_rectangle)
             box = np.intp(box)
-
-            # Rysowanie prostokąta na obrazie
-            cv.polylines(self.image_scaled, [box], -1, (0, 255, 0), 1)
+            cv.polylines(self.image_scaled, [box], -1, (0, 255, 0), 1)  # Rysowanie prostokąta na obrazie
             
             sorted_box = self._sort_box_points(box)
 
