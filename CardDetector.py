@@ -19,23 +19,23 @@ class CardDetector:
         self.cards = []
 
     # Filtracja w celu uwydatnienia krawędzi kart
-    def filtering_edges_card(self, image):
-        img_median = cv.medianBlur(image, 13)  # Usuwanie szumów za pomocą rozmycia medianowego
-        img_gaussian = cv.GaussianBlur(img_median, (15, 15), 15.0)  # Dodatkowe rozmycie za pomocą filtra Gaussa
+    def _filtering_edges_card(self, image):
+        img_median = cv.medianBlur(image, 13)
+        img_gaussian = cv.GaussianBlur(img_median, (15, 15), 15.0)
         img_unsharped = cv.addWeighted(img_median, 2.0, img_gaussian, -1.0, 0)  # Wyostrzenie obrazu przez odjęcie 
         img_gray = cv.cvtColor(img_unsharped, cv.COLOR_BGR2GRAY)
-        img_inverted = cv.bitwise_not(img_gray)  # Inwersja obrazu
+        img_inverted = cv.bitwise_not(img_gray) 
         _, img_binary = cv.threshold(img_inverted, 230, 255, cv.THRESH_BINARY)
-        img_binary_inv = cv.bitwise_not(img_binary)  # Inwersja obrazu
-        kernel = np.ones((8, 8), np.uint8)  # Kernel do erozji
-        eroded_image = cv.erode(img_binary_inv, kernel, iterations=1)  # Erozja
-        canny = cv.Canny(eroded_image, 120, 255, 1)  # Detekcja krawędzi Canny'ego
+        img_binary_inv = cv.bitwise_not(img_binary)
+        kernel = np.ones((8, 8), np.uint8)
+        eroded_image = cv.erode(img_binary_inv, kernel, iterations=1)
+        canny = cv.Canny(eroded_image, 120, 255, 1)  # Detekcja krawędzi
         return canny
 
     # Funkcja wycinająca kartę
     def cut_cards(self):
         # Filtracja zdjęcia w celu uwydatnienia konturów
-        filtred_img = self.filtering_edges_card(self.image_scaled)
+        filtred_img = self._filtering_edges_card(self.image_scaled)
         contours, _ = cv.findContours(filtred_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
         # Opisanie prostokąta wokół każdej karty
@@ -72,7 +72,7 @@ class CardDetector:
 
         return sorted_box
 
-    def filtering_edges_number(self, card_image):
+    def _filtering_edges_number(self, card_image):
         card_gray = cv.cvtColor(card_image, cv.COLOR_BGR2GRAY)
         card_median = cv.medianBlur(card_gray, 15)
         card_gaussian = cv.GaussianBlur(card_median, (11, 11), 5)
@@ -95,7 +95,7 @@ class CardDetector:
         canny = cv.Canny(card_dilated, 120, 255, 1)
         return canny
 
-    def masking_card_elipse(self, image_card, card_clean):
+    def _masking_card_elipse(self, image_card, card_clean):
         height, width = card_clean.shape[:2]
         center_coordinates = (width // 2, height // 2)
         mask = np.zeros((height, width), np.uint8)
@@ -108,7 +108,7 @@ class CardDetector:
         masked_card = cv.bitwise_and(image_card, image_card, mask=mask)
         return masked_card
 
-    def masking_card_rectangle(self, image_card, card_clean):
+    def _masking_card_rectangle(self, image_card, card_clean):
         height, width = card_clean.shape[:2]
         mask = np.zeros((height, width), np.uint8)
         start_poit = (60, 90)
@@ -121,12 +121,12 @@ class CardDetector:
         masked_card = cv.bitwise_and(image_card, image_card, mask=mask)
         return masked_card
 
-    def get_hu_moments(self, img_card):
+    def _get_hu_moments(self, img_card):
         moments = cv.moments(img_card)
         hu_moments = cv.HuMoments(moments)
         return hu_moments
 
-    def get_symbol(self, hu_moments):
+    def _get_symbol(self, hu_moments):
         # zakres momentów dla 1
         lower_moment_hu_0_1 = 1.355e-02
         upper_moment_hu_0_1 = 1.881e-02
@@ -184,7 +184,7 @@ class CardDetector:
         return color
 
     # Okteślenie koloru karty
-    def get_color(self, pixel_card):
+    def _get_color(self, pixel_card):
         lower_green = np.array([45, 30, 30])
         upper_green = np.array([65, 255, 255])
 
@@ -209,12 +209,12 @@ class CardDetector:
 
     def process_cards(self):
         for card in self.cards:
-            binary_card = self.filtering_edges_number(card.image)
-            masked_binary_card = self.masking_card_elipse(binary_card, card.image)
-            masked_binary_card = self.masking_card_rectangle(masked_binary_card, card.image)
-            hu_moments = self.get_hu_moments(masked_binary_card)
-            card.symbol = self.get_symbol(hu_moments)
-            card.color = self.get_color(self.color_average(card.image))
+            binary_card = self._filtering_edges_number(card.image)
+            masked_binary_card = self._masking_card_elipse(binary_card, card.image)
+            masked_binary_card = self._masking_card_rectangle(masked_binary_card, card.image)
+            hu_moments = self._get_hu_moments(masked_binary_card)
+            card.symbol = self._get_symbol(hu_moments)
+            card.color = self._get_color(self.color_average(card.image))
 
     def show_cards(self): 
         for card in self.cards:
