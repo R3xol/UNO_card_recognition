@@ -46,13 +46,8 @@ class CardDetector:
 
             # Rysowanie prostokąta na obrazie
             cv.polylines(self.image_scaled, [box], -1, (0, 255, 0), 1)
-
-            # Sortowanie wierzchołków w odpowiedniej kolejności
-            sorted_box = sorted(box, key=lambda coord: coord[0] + coord[1]) 
-            x2, _ = sorted_box[1]
-            x3, _ = sorted_box[2]
-            if x3 > x2:
-                sorted_box[1], sorted_box[2] = sorted_box[2], sorted_box[1]
+            
+            sorted_box = self._sort_box_points(box)
 
             # Wycięcie karty w formacie 210x300 px
             width, height = 210, 300
@@ -64,6 +59,18 @@ class CardDetector:
             # Tworzenie obiektu karty
             card = Card(card_image, sorted_box, np.intp(min_rectangle[0]))
             self.cards.append(card)
+
+    def _sort_box_points(self, box):
+        '''Sortuje wierzchołki prostokąta w kolejności:
+        [lewy górny, prawy górny, lewy dolny, prawy dolny]'''
+
+        sorted_box = sorted(box, key=lambda coord: coord[0] + coord[1])
+
+        # Upewnienie się, że punkty są w odpowiedniej kolejności
+        if sorted_box[1][0] < sorted_box[2][0]:
+            sorted_box[1], sorted_box[2] = sorted_box[2], sorted_box[1]
+
+        return sorted_box
 
     def filtering_edges_number(self, card_image):
         card_gray = cv.cvtColor(card_image, cv.COLOR_BGR2GRAY)
@@ -133,7 +140,7 @@ class CardDetector:
         upper_moment_hu_1_5 = 1.95e-05
 
         # zakres momentów dla 3
-        lower_moment_hu_0_3 = 1.225e-02
+        lower_moment_hu_0_3 = 1.125e-02
         upper_moment_hu_0_3 = 1.31e-02
         lower_moment_hu_1_3 = 1.44e-05
         upper_moment_hu_1_3 = 2.2856e-05
