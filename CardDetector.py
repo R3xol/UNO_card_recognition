@@ -180,10 +180,13 @@ class CardDetector:
     def get_color(self, pixel_card):
         lower_green = np.array([45, 30, 30])
         upper_green = np.array([65, 255, 255])
+
         lower_blue = np.array([1, 30, 30])
         upper_blue = np.array([25, 255, 255])
+        
         lower_yellow = np.array([80, 30, 30])
         upper_yellow = np.array([100, 255, 255])
+
         lower_red = np.array([110, 30, 30])
         upper_red = np.array([125, 255, 255])
 
