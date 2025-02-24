@@ -1,7 +1,16 @@
 import cv2 as cv
 import numpy as np
 
-from Card import Card
+from dataclasses import dataclass
+from typing import List, Optional
+
+@dataclass
+class Card:
+    image: np.ndarray                       # Macierz przechowujaca karte (RGB)
+    box: List[int]                          # Lista 4 liczb (np. [x1, y1, x2, y2])
+    center: np.ndarray                      # Środek jako macierz lub lista współrzędnych [x, y]
+    color: Optional[str] = None             # Kolor, np. "czerwony", domyślnie brak
+    symbol: Optional[str] = None            # Symbol (np. "1"), domyślnie brak
 
 class CardDetector:
     def __init__(self, image_path):
@@ -13,10 +22,10 @@ class CardDetector:
     def filtering_edges_card(self, image):
         img_median = cv.medianBlur(image, 13)  # Usuwanie szumów za pomocą rozmycia medianowego
         img_gaussian = cv.GaussianBlur(img_median, (15, 15), 15.0)  # Dodatkowe rozmycie za pomocą filtra Gaussa
-        img_unsharped = cv.addWeighted(img_median, 2.0, img_gaussian, -1.0, 0)  # Wyostrzenie obrazu
-        img_gray = cv.cvtColor(img_unsharped, cv.COLOR_BGR2GRAY)  # Konwersja obrazu do skali szarości
+        img_unsharped = cv.addWeighted(img_median, 2.0, img_gaussian, -1.0, 0)  # Wyostrzenie obrazu przez odjęcie 
+        img_gray = cv.cvtColor(img_unsharped, cv.COLOR_BGR2GRAY)
         img_inverted = cv.bitwise_not(img_gray)  # Inwersja obrazu
-        _, img_binary = cv.threshold(img_inverted, 230, 255, cv.THRESH_BINARY)  # Próg binarny
+        _, img_binary = cv.threshold(img_inverted, 230, 255, cv.THRESH_BINARY)
         img_binary_inv = cv.bitwise_not(img_binary)  # Inwersja obrazu
         kernel = np.ones((8, 8), np.uint8)  # Kernel do erozji
         eroded_image = cv.erode(img_binary_inv, kernel, iterations=1)  # Erozja
