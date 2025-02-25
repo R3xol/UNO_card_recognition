@@ -15,6 +15,10 @@ class Card:
 class CardDetector:
     def __init__(self, image_path):
         self.image = cv.imread(image_path)
+
+        if self.image is None:
+            raise ValueError(f"Nie można załadować obrazu z: {image_path}")
+        
         self.image_scaled = cv.resize(self.image, (0, 0), fx=0.6, fy=0.6)
         self.cards = []
 
