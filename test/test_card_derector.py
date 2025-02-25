@@ -93,14 +93,15 @@ def test_get_color():
 
 def test_show_cards():
     with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
-        blank_image = np.zeros((400, 400, 3), dtype=np.uint8)
+        blank_image = np.zeros((1200, 1600, 3), dtype=np.uint8)
+        vertices = np.array([[92/0.7, 254/0.7], [269/0.7, 256/0.7], [266/0.7, 527/0.7], [90/0.7, 525/0.7]], dtype=np.int32)
+        cv.polylines(blank_image, [vertices], isClosed=True, color=(255, 255, 255), thickness=2)
         cv.imwrite(temp_img.name, blank_image)
 
         detector = CardDetector(image_path=temp_img.name)
-        detector.cards = [Card(np.zeros((210, 300, 3), dtype=np.uint8), [[10,10], [30,10], [30,20], [10,20]], [0, 0], "ZIELONA", "5")]
+        detector.cards = [Card(np.zeros((210, 300, 3), dtype=np.uint8), [[ 92, 254], [269, 256], [ 90, 525], [266, 527]], [179, 391], "ZIELONA", "5")]
 
         detector.show_cards()  # Upewnij się, że działa bez wyjątków 
-        cv.destroyAllWindows()
 
 
 def test_number_of_detected_cards():
