@@ -30,7 +30,7 @@ class ImageMenu:
                 if 1 <= choice <= len(self.images):
                     return choice - 1  # Zwracamy indeks pliku (0-indexed)
                 else:
-                    print(f"Niepoprawny numer, proszę wybrać numer od 1 do {len(self.images)} lub 'q' na wyjście.")
+                    print(f"Niepoprawny numer, proszę wybrać numer od 1 do {len(self.images)} lub 'q' aby wyjście.")
             except ValueError:
                 print("Proszę podać liczbę lub 'q'.")
 

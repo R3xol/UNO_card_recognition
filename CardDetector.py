@@ -15,9 +15,16 @@ class Card:
 class CardDetector:
     def __init__(self, image):
         self._image = image
-        
-        self.image_scaled = cv.resize(self._image, (0, 0), fx=0.6, fy=0.6)
+        self._image_scaled = cv.resize(self._image, (0, 0), fx=0.6, fy=0.6)
         self._cards = []
+
+    @property
+    def image_scaled(self) -> np.ndarray:
+        return self._image_scaled
+
+    @image_scaled.setter
+    def image_scaled(self, value):
+        raise AttributeError("image_scaled nie może być modyfikowana.")
 
     # Filtracja w celu uwydatnienia krawędzi kart
     def _filtering_edges_card(self, image):
@@ -36,7 +43,7 @@ class CardDetector:
     # Funkcja wycinająca kartę
     def cut_cards(self):
         # Filtracja zdjęcia w celu uwydatnienia konturów
-        filtred_img = self._filtering_edges_card(self.image_scaled)
+        filtred_img = self._filtering_edges_card(self._image_scaled)
         contours, _ = cv.findContours(filtred_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
         # Opisanie prostokąta wokół każdej karty
@@ -44,7 +51,7 @@ class CardDetector:
             min_rectangle = cv.minAreaRect(outline)
             box = cv.boxPoints(min_rectangle)
             box = np.intp(box)
-            cv.polylines(self.image_scaled, [box], -1, (0, 255, 0), 1)  # Rysowanie prostokąta na obrazie
+            cv.polylines(self._image_scaled, [box], -1, (0, 255, 0), 1)  # Rysowanie prostokąta na obrazie
             
             sorted_box = self._sort_box_points(box)
 
@@ -53,7 +60,7 @@ class CardDetector:
             points_first = np.float32(sorted_box)
             points_after = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
             transform_matrix = cv.getPerspectiveTransform(points_first, points_after)
-            card_image = cv.warpPerspective(self.image_scaled, transform_matrix, (width, height))
+            card_image = cv.warpPerspective(self._image_scaled, transform_matrix, (width, height))
 
             # Tworzenie obiektu karty
             card = Card(card_image, sorted_box, np.intp(min_rectangle[0]))
@@ -216,6 +223,14 @@ class CardDetector:
             card.color = self._get_color(self.color_average(card.image))
 
     def show_cards(self): 
+        # Definiowanie kolorów w formacie BGR
+        colors = {
+            "ZIELONA": (0, 255, 0),    # Zielony
+            "NIEBIESKA": (255, 0, 0),  # Niebieski
+            "CZERWONA": (0, 0, 255),   # Czerwony
+            "ZOLTA": (0, 255, 255)     # Żółty
+            }
+        
         for card in self._cards:
             # Przypisanie współżędnych lewego górnego narożnika
             box = card.box[0]
@@ -224,13 +239,13 @@ class CardDetector:
 
             # Sprawdzenie warunku czy karta jest specjalna i ewentualne wyświetlenie 
             if card.symbol == "ZK" or card.symbol == "+2":
-                cv.putText(self.image_scaled, center, tuple(box), cv.FONT_HERSHEY_COMPLEX, 0.7, (255, 255, 255))
+                cv.putText(self._image_scaled, center, tuple(box), cv.FONT_HERSHEY_COMPLEX, 0.7, colors[card.color])
 
             box[1] -= 40
             text = f"{card.color}  {card.symbol}"
-            cv.putText(self.image_scaled, text, tuple(box), cv.FONT_HERSHEY_COMPLEX, 0.7, (255, 255, 255))
+            cv.putText(self._image_scaled, text, tuple(box), cv.FONT_HERSHEY_COMPLEX, 0.7, colors[card.color])
 
-        cv.imshow("Zdjecie kart z opisami", self.image_scaled)
+        cv.imshow("Zdjecie kart z opisami", self._image_scaled)
         cv.waitKey(0)
         cv.destroyAllWindows()
 
