@@ -1,5 +1,6 @@
 from CardDetector import CardDetector
 import os
+import cv2 as cv
 
 class ImageMenu:
     def __init__(self, directory):
@@ -75,7 +76,8 @@ class ImageMenu:
                 continue  # Powrót do menu głównego
 
             # Przekazujemy wybrany obrazek do detekcji kart
-            detector = CardDetector(os.path.join(self.directory, selected_image))
+            image = cv.imread(os.path.join(self.directory, selected_image))
+            detector = CardDetector(image)
             
             if action_choice == 1:
                 # Zaznacz karty na zdjęciu

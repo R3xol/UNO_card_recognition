@@ -13,14 +13,11 @@ class Card:
     symbol: Optional[str] = None            # Symbol (np. "1"), domyślnie brak
 
 class CardDetector:
-    def __init__(self, image_path):
-        self.image = cv.imread(image_path)
-
-        if self.image is None:
-            raise ValueError(f"Nie można załadować obrazu z: {image_path}")
+    def __init__(self, image):
+        self._image = image
         
-        self.image_scaled = cv.resize(self.image, (0, 0), fx=0.6, fy=0.6)
-        self.cards = []
+        self.image_scaled = cv.resize(self._image, (0, 0), fx=0.6, fy=0.6)
+        self._cards = []
 
     # Filtracja w celu uwydatnienia krawędzi kart
     def _filtering_edges_card(self, image):
@@ -60,7 +57,7 @@ class CardDetector:
 
             # Tworzenie obiektu karty
             card = Card(card_image, sorted_box, np.intp(min_rectangle[0]))
-            self.cards.append(card)
+            self._cards.append(card)
 
     def _sort_box_points(self, box):
         '''Sortuje wierzchołki prostokąta w kolejności:
@@ -210,7 +207,7 @@ class CardDetector:
             return "CZERWONA"
 
     def process_cards(self):
-        for card in self.cards:
+        for card in self._cards:
             binary_card = self._filtering_edges_number(card.image)
             masked_binary_card = self._masking_card_elipse(binary_card, card.image)
             masked_binary_card = self._masking_card_rectangle(masked_binary_card, card.image)
@@ -219,7 +216,7 @@ class CardDetector:
             card.color = self._get_color(self.color_average(card.image))
 
     def show_cards(self): 
-        for card in self.cards:
+        for card in self._cards:
             # Przypisanie współżędnych lewego górnego narożnika
             box = card.box[0]
             box[1] -= 10
@@ -238,7 +235,7 @@ class CardDetector:
         cv.destroyAllWindows()
 
     def show_single_card(self):
-        for index ,card in enumerate(self.cards):
+        for index ,card in enumerate(self._cards):
             cv.imshow(f"Karta{index+1}" ,card.image)
             cv.waitKey(0)
             cv.destroyAllWindows()

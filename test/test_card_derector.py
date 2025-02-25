@@ -10,28 +10,26 @@ import tempfile
 def test_card_detector_init():
     with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
         blank_image = np.zeros((200, 300, 3), dtype=np.uint8)
-        cv.imwrite(temp_img.name, blank_image)
 
-        detector = CardDetector(image_path=temp_img.name)
+        detector = CardDetector(image=blank_image)
 
-        assert detector.image is not None
+        assert detector._image is not None
         assert detector.image_scaled is not None
-        assert detector.cards == []  # Powinna być pusta lista kart
+        assert detector._cards == []  # Powinna być pusta lista kart
 
 
 def test_process_cards_calls_methods():
     with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
         # Tworzymy czarny obraz (100x100 px)
         blank_image = np.zeros((100, 100, 3), dtype=np.uint8)
-        cv.imwrite(temp_img.name, blank_image)
 
-        detector = CardDetector(image_path=temp_img.name)
-        assert detector.image is not None
+        detector = CardDetector(image=blank_image)
+        assert detector._image is not None
 
     # Tworzymy atrapę obiektu karty
     mock_card = MagicMock()
     mock_card.image = "fake_image"
-    detector.cards = [mock_card]
+    detector._cards = [mock_card]
 
     # Podmieniamy metody na mocki
     detector._filtering_edges_number = MagicMock()
@@ -58,22 +56,20 @@ def test_cut_cards():
     with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
         blank_image = np.zeros((400, 400, 3), dtype=np.uint8)
         cv.rectangle(blank_image, (100, 100), (300, 300), (255, 255, 255), -1)  # Dodajemy biały kwadrat jako karta
-        cv.imwrite(temp_img.name, blank_image)
 
-        detector = CardDetector(image_path=temp_img.name)
+        detector = CardDetector(image=blank_image)
 
         detector.cut_cards()
 
-        assert len(detector.cards) == 1
-        assert isinstance(detector.cards[0].image, np.ndarray)  # Obraz karty
+        assert len(detector._cards) == 1
+        assert isinstance(detector._cards[0].image, np.ndarray)  # Obraz karty
 
 
 def test_get_symbol():
     with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
         blank_image = np.zeros((100, 100, 3), dtype=np.uint8)
-        cv.imwrite(temp_img.name, blank_image)
         
-        detector = CardDetector(image_path=temp_img.name)
+        detector = CardDetector(image=blank_image)
 
     assert detector._get_symbol([1.4e-02, 1.7e-07, 2e-07]) == "1"
 
@@ -81,9 +77,8 @@ def test_get_symbol():
 def test_get_color():
     with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
         blank_image = np.zeros((100, 100, 3), dtype=np.uint8)
-        cv.imwrite(temp_img.name, blank_image)
 
-        detector = CardDetector(image_path=temp_img.name)
+        detector = CardDetector(image=blank_image)
 
         assert detector._get_color(np.array([50, 200, 200])) == "ZIELONA"
         assert detector._get_color(np.array([10, 200, 200])) == "NIEBIESKA"
@@ -96,10 +91,9 @@ def test_show_cards():
         blank_image = np.zeros((1200, 1600, 3), dtype=np.uint8)
         vertices = np.array([[92/0.7, 254/0.7], [269/0.7, 256/0.7], [266/0.7, 527/0.7], [90/0.7, 525/0.7]], dtype=np.int32)
         cv.polylines(blank_image, [vertices], isClosed=True, color=(255, 255, 255), thickness=2)
-        cv.imwrite(temp_img.name, blank_image)
 
-        detector = CardDetector(image_path=temp_img.name)
-        detector.cards = [Card(np.zeros((210, 300, 3), dtype=np.uint8), [[ 92, 254], [269, 256], [ 90, 525], [266, 527]], [179, 391], "ZIELONA", "5")]
+        detector = CardDetector(image=blank_image)
+        detector._cards = [Card(np.zeros((210, 300, 3), dtype=np.uint8), [[ 92, 254], [269, 256], [ 90, 525], [266, 527]], [179, 391], "ZIELONA", "5")]
 
         detector.show_cards()  # Upewnij się, że działa bez wyjątków 
 
@@ -109,10 +103,9 @@ def test_number_of_detected_cards():
         blank_image = np.zeros((400, 400, 3), dtype=np.uint8)
         cv.rectangle(blank_image, (50, 50), (150, 200), (255, 255, 255), -1)
         cv.rectangle(blank_image, (200, 200), (350, 300), (255, 255, 255), -1)
-        cv.imwrite(temp_img.name, blank_image)
 
-        detector = CardDetector(image_path=temp_img.name)
+        detector = CardDetector(image=blank_image)
 
         detector.cut_cards()
 
-        assert len(detector.cards) == 2
+        assert len(detector._cards) == 2
