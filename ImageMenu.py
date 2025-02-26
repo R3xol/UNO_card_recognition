@@ -62,7 +62,7 @@ class ImageMenu:
             choice = self.get_user_choice()
 
             if choice == 'q':
-                print("Zakończenie programu.")
+                print("Zakończenie działania programu.")
                 break  # Kończy działanie programu
 
             selected_image = self.images[choice]
