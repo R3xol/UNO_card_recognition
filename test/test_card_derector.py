@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock
 from CardDetector import CardDetector
 from CardDetector import Card
 import cv2 as cv
@@ -8,23 +8,21 @@ import numpy as np
 import tempfile
 
 def test_card_detector_init():
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
-        blank_image = np.zeros((200, 300, 3), dtype=np.uint8)
+    blank_image = np.zeros((200, 300, 3), dtype=np.uint8)
 
-        detector = CardDetector(image=blank_image)
+    detector = CardDetector(image=blank_image)
 
-        assert detector._image is not None
-        assert detector.image_scaled is not None
-        assert detector._cards == []  # Powinna być pusta lista kart
+    assert detector._image is not None
+    assert detector.image_scaled is not None
+    assert detector._cards == []  # Powinna być pusta lista kart
 
 
 def test_process_cards_calls_methods():
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
-        # Tworzymy czarny obraz (100x100 px)
-        blank_image = np.zeros((100, 100, 3), dtype=np.uint8)
+    # Tworzymy czarny obraz (100x100 px)
+    blank_image = np.zeros((100, 100, 3), dtype=np.uint8)
 
-        detector = CardDetector(image=blank_image)
-        assert detector._image is not None
+    detector = CardDetector(image=blank_image)
+    assert detector._image is not None
 
     # Tworzymy atrapę obiektu karty
     mock_card = MagicMock()
@@ -53,59 +51,62 @@ def test_process_cards_calls_methods():
     detector.color_average.assert_called_once_with(mock_card.image)
 
 def test_cut_cards():
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
-        blank_image = np.zeros((400, 400, 3), dtype=np.uint8)
-        cv.rectangle(blank_image, (100, 100), (300, 300), (255, 255, 255), -1)  # Dodajemy biały kwadrat jako karta
+    blank_image = np.zeros((400, 400, 3), dtype=np.uint8)
+    cv.rectangle(blank_image, (100, 100), (300, 300), (255, 255, 255), -1)  # Dodajemy biały kwadrat jako karta
 
-        detector = CardDetector(image=blank_image)
+    detector = CardDetector(image=blank_image)
 
-        detector.cut_cards()
+    detector.cut_cards()
 
-        assert len(detector._cards) == 1
-        assert isinstance(detector._cards[0].image, np.ndarray)  # Obraz karty
+    assert len(detector._cards) == 1
+    assert isinstance(detector._cards[0].image, np.ndarray)  # Obraz karty
 
 
 def test_get_symbol():
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
-        blank_image = np.zeros((100, 100, 3), dtype=np.uint8)
+    blank_image = np.zeros((100, 100, 3), dtype=np.uint8)
         
-        detector = CardDetector(image=blank_image)
+    detector = CardDetector(image=blank_image)
 
     assert detector._get_symbol([1.4e-02, 1.7e-07, 2e-07]) == "1"
 
 
 def test_get_color():
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
-        blank_image = np.zeros((100, 100, 3), dtype=np.uint8)
+    blank_image = np.zeros((100, 100, 3), dtype=np.uint8)
 
-        detector = CardDetector(image=blank_image)
+    detector = CardDetector(image=blank_image)
 
-        assert detector._get_color(np.array([50, 200, 200])) == "ZIELONA"
-        assert detector._get_color(np.array([10, 200, 200])) == "NIEBIESKA"
-        assert detector._get_color(np.array([90, 200, 200])) == "ZOLTA"
-        assert detector._get_color(np.array([120, 200, 200])) == "CZERWONA"
+    assert detector._get_color(np.array([50, 200, 200])) == "ZIELONA"
+    assert detector._get_color(np.array([10, 200, 200])) == "NIEBIESKA"
+    assert detector._get_color(np.array([90, 200, 200])) == "ZOLTA"
+    assert detector._get_color(np.array([120, 200, 200])) == "CZERWONA"
 
 
 def test_show_cards():
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
-        blank_image = np.zeros((1200, 1600, 3), dtype=np.uint8)
-        vertices = np.array([[92/0.7, 254/0.7], [269/0.7, 256/0.7], [266/0.7, 527/0.7], [90/0.7, 525/0.7]], dtype=np.int32)
-        cv.polylines(blank_image, [vertices], isClosed=True, color=(255, 255, 255), thickness=2)
+    blank_image = np.zeros((1200, 1600, 3), dtype=np.uint8)
+    vertices = np.array([[92/0.7, 254/0.7], [269/0.7, 256/0.7], [266/0.7, 527/0.7], [90/0.7, 525/0.7]], dtype=np.int32)
+    cv.polylines(blank_image, [vertices], isClosed=True, color=(255, 255, 255), thickness=2)
 
-        detector = CardDetector(image=blank_image)
-        detector._cards = [Card(np.zeros((210, 300, 3), dtype=np.uint8), [[ 92, 254], [269, 256], [ 90, 525], [266, 527]], [179, 391], "ZIELONA", "5")]
+    detector = CardDetector(image=blank_image)
+    detector._cards.append(Card(np.zeros((210, 300, 3), dtype=np.uint8), [[ 92, 254], [269, 256], [ 90, 525], [266, 527]], [179, 391], "ZIELONA", "5"))
 
-        detector.show_cards()  # Upewnij się, że działa bez wyjątków 
+    # Gdy chcemy wyswietlic karte
+    #detector.show_cards()
+
+    # Mockujemy cv.imshow() i cv.waitKey(), aby zapobiec otwieraniu okna
+    with patch("cv2.imshow"), patch("cv2.waitKey", return_value=0):
+        detector.show_cards()
+
+    # Sprawdzamy, czy metoda się wykonała bez błędów
+    assert True 
 
 
 def test_number_of_detected_cards():
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_img:
-        blank_image = np.zeros((400, 400, 3), dtype=np.uint8)
-        cv.rectangle(blank_image, (50, 50), (150, 200), (255, 255, 255), -1)
-        cv.rectangle(blank_image, (200, 200), (350, 300), (255, 255, 255), -1)
+    blank_image = np.zeros((400, 400, 3), dtype=np.uint8)
+    cv.rectangle(blank_image, (50, 50), (150, 200), (255, 255, 255), -1)
+    cv.rectangle(blank_image, (200, 200), (350, 300), (255, 255, 255), -1)
 
-        detector = CardDetector(image=blank_image)
+    detector = CardDetector(image=blank_image)
 
-        detector.cut_cards()
+    detector.cut_cards()
 
-        assert len(detector._cards) == 2
+    assert len(detector._cards) == 2
