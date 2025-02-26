@@ -32,13 +32,13 @@ class ImageMenu:
                 else:
                     print(f"Niepoprawny numer, proszę wybrać numer od 1 do {len(self.images)} lub 'q' aby wyjście.")
             except ValueError:
-                print("Proszę podać liczbę lub 'q'.")
+                print("Proszę podać liczbę całkowitą lub 'q'.")
 
     def display_action_menu(self):
         """Wyświetla menu wyboru akcji (co zrobić z wybranym obrazem)"""
         print("\nCo chcesz zrobić z wybranym obrazem?")
         print("1. Zaznacz karty na zdjęciu")
-        print("2. Wyświetl tylko karty")
+        print("2. Wyświetl karty")
         print("3. Powrót do menu głównego")
 
     def get_action_choice(self):
