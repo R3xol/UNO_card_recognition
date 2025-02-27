@@ -63,7 +63,7 @@ class CardDetector:
             card_image = cv.warpPerspective(self._image_scaled, transform_matrix, (width, height))
 
             # Tworzenie obiektu karty
-            card = Card(card_image, sorted_box, np.intp(min_rectangle[0]))
+            card = Card(image=card_image, box=sorted_box, center=np.intp(min_rectangle[0]))
             self._cards.append(card)
 
     def _sort_box_points(self, box):
