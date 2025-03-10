@@ -7,7 +7,7 @@ from typing import List, Optional
 @dataclass
 class Card:
     image: np.ndarray                       # Macierz przechowujaca karte (RGB)
-    box: List[int]                          # Lista 4 liczb (np. [x1, y1, x2, y2])
+    box: List[int]                          # Lista 4 liczb (np. [[x1, y1], [x2, y2], [x3, y3], [x4, y4]])
     center: np.ndarray                      # Środek jako macierz lub lista współrzędnych [x, y]
     color: Optional[str] = None             # Kolor, np. "czerwony", domyślnie brak
     symbol: Optional[str] = None            # Symbol (np. "1"), domyślnie brak
