@@ -52,13 +52,13 @@ def test_process_cards_calls_methods():
 
 def test_cut_cards():
     blank_image = np.zeros((400, 400, 3), dtype=np.uint8)
-    cv.rectangle(blank_image, (100, 100), (300, 300), (255, 255, 255), -1)  # Dodajemy biały kwadrat jako karta
+    cv.rectangle(blank_image, (100, 100), (200, 300), (255, 255, 255), -1)  # Dodajemy biały kwadrat jako karta
 
     detector = CardDetector(image=blank_image)
 
     detector.cut_cards()
 
-    assert len(detector._cards) == 1
+    assert len(detector._cards) == 1, "Can't detected, a card"
     assert isinstance(detector._cards[0].image, np.ndarray)  # Obraz karty
 
 
