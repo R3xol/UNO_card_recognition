@@ -173,12 +173,13 @@ class CardDetector:
         elif (hu_moments[0] > lower_moment_hu_0_zk and hu_moments[0] < upper_moment_hu_0_zk and
               hu_moments[1] > lower_moment_hu_1_zk and hu_moments[1] < upper_moment_hu_1_zk):
             return "ZK"
+        elif ((hu_moments[0] > lower_moment_hu_0_5 or hu_moments[0] < upper_moment_hu_0_5)or
+              (hu_moments[0] > lower_moment_hu_0_5 and hu_moments[0] < upper_moment_hu_0_5) and
+              hu_moments[1] > lower_moment_hu_1_5 and hu_moments[1] < upper_moment_hu_1_5):
+            return "5"
         elif (hu_moments[0] > lower_moment_hu_0_3 and hu_moments[0] < upper_moment_hu_0_3 and
               hu_moments[1] > lower_moment_hu_1_3 and hu_moments[1] < upper_moment_hu_1_3):
             return "3"
-        elif ((hu_moments[0] > lower_moment_hu_0_5 or hu_moments[0] < upper_moment_hu_0_5) and
-              hu_moments[1] > lower_moment_hu_1_5 and hu_moments[1] < upper_moment_hu_1_5):
-            return "5"
         else:
             return ":("
 
